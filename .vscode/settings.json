@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/resumeforge-parser/venv/bin/python",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/resumeforge-parser"
+  ]
+}
+
