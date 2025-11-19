@@ -37,6 +37,8 @@ def clean_text(text):
     text = text.replace('\n', ' ')
     return text
 
+
+
 @app.route('/', methods=['GET'])
 def health_check():
     """Simple endpoint to confirm the Flask service is running."""
