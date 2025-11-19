@@ -24,7 +24,7 @@ export default function SignIn() {
         setIsLoading(false);
 
         if (result?.error) {
-            alert("Invalid credentials. Try test@example.com / password");
+            alert("Invalid credentials.");
         } else {
             router.push('/');
         }
