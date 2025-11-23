@@ -3,6 +3,8 @@ import { hash } from 'bcryptjs';
 import { prisma } from '@/lib/db';
 import { isValidEmail, isStrongPassword } from '@/lib/validation';
 import { rateLimit, RATE_LIMITS } from '@/lib/ratelimit';
+import { generateOtp, createOtpToken } from '@/lib/otp';
+import { sendOtpEmail } from '@/lib/email';
 
 export async function POST(req: Request) {
     try {
@@ -75,13 +77,19 @@ export async function POST(req: Request) {
             },
         });
 
+        // Generate OTP and send verification email
+        const otp = generateOtp();
+        await createOtpToken(email, otp);
+        await sendOtpEmail(email, otp);
+
         return NextResponse.json(
             {
-                message: 'User created successfully',
+                message: 'User created successfully. Verification email sent.',
                 user: {
                     id: user.id,
                     name: user.name,
-                    email: user.email
+                    email: user.email,
+                    isEmailVerified: false
                 }
             },
             { status: 201 }

@@ -56,6 +56,16 @@ export default function UploadForm() {
         return;
       }
 
+      // Check if email is verified
+      if (session?.user && !session.user.isEmailVerified) {
+        setError('Please verify your email address to continue. Check your inbox for the verification code.');
+        // Optionally redirect to verification page
+        setTimeout(() => {
+          router.push(`/verify-email?email=${encodeURIComponent(session.user?.email || '')}`);
+        }, 2000);
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
 
@@ -74,6 +84,11 @@ export default function UploadForm() {
           try {
             const errorData = await response.json();
             errorMsg = errorData.error || errorMsg;
+
+            // Handle monthly limit specific error
+            if (response.status === 429 && errorMsg.includes('Monthly resume optimization limit reached')) {
+              errorMsg = 'You have reached your monthly limit of 3 resume optimizations. Please upgrade your plan or try again next month.';
+            }
           } catch (e) {
             console.error('Failed to parse error response:', e);
             errorMsg = `Server Error (${response.status}): The server returned an invalid response.`;

@@ -40,8 +40,8 @@ export default function SignUp() {
                 });
 
                 if (result?.ok) {
-                    // Redirect to homepage with welcome flag
-                    router.push('/?welcome=true');
+                    // Redirect to verification page
+                    router.push(`/verify-email?email=${encodeURIComponent(email)}`);
                 } else {
                     // If auto sign-in fails, redirect to sign-in page
                     router.push('/signin');

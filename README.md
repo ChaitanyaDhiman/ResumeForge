@@ -19,14 +19,22 @@ ResumeForge is an AI-powered resume optimization tool that helps job seekers tai
   - **Auth Protection**: Users must sign in to generate AI-powered suggestions
   - **Password Strength**: Enforced requirements (8+ chars, uppercase, lowercase, number)
   - **Email Validation**: Server-side email format validation
+  - **Email Verification**: OTP-based verification for new registrations (powered by Resend)
+- **Usage Limits**:
+  - **Monthly Quota**: 3 resume optimizations per user per month
+  - **Usage Tracking**: Real-time tracking of optimization requests
 - **Rate Limiting**: Protection against API abuse and DoS attacks
   - Registration: 5 requests/minute per IP
   - Resume parsing: 10 requests/minute per user
+  - OTP Resend: 5 requests/10 minutes per email
 - **Input Validation**: Comprehensive validation and sanitization
   - File type validation (PDF, DOCX only)
   - File size limits (10MB default, configurable)
   - XSS prevention through text sanitization
 - **Optimized Database**: Prisma client singleton for improved performance
+
+### Authentication Flow
+![Email Verification & OTP Flow](/email_otp_flow.png)
 
 ### User Experience
 - **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS

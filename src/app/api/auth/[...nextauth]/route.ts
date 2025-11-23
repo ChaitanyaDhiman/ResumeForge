@@ -80,12 +80,14 @@ export const authOptions: NextAuthOptions = {
                 session.user.email = token.email;
                 session.user.image = token.picture;
                 (session.user as any).isNewUser = token.isNewUser || false;
+                (session.user as any).isEmailVerified = token.isEmailVerified || false;
             }
             return session;
         },
         async jwt({ token, user, account }) {
             if (user) {
                 token.id = user.id;
+                token.isEmailVerified = (user as any).isEmailVerified ?? false;
                 // Check if this is a new user (marked in signIn callback)
                 if ((user as any).isNewUser) {
                     token.isNewUser = true;

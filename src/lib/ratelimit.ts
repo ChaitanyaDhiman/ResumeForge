@@ -68,4 +68,5 @@ export const RATE_LIMITS = {
     PARSE_RESUME: { maxRequests: 10, windowMs: 60 * 1000 },
     // 20 requests per minute for general API
     GENERAL: { maxRequests: 20, windowMs: 60 * 1000 },
+    RESEND_OTP: { maxRequests: 5, windowMs: 10 * 60 * 1000 }
 };
