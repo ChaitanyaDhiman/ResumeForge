@@ -80,9 +80,18 @@ export async function POST(request: Request) {
 
     console.log(`Sending file to Flask at: ${FLASK_PARSER_URL}/extract-text`);
 
+    // Forward authentication headers to bypass Vercel Deployment Protection
+    const headers = new Headers();
+    const cookie = request.headers.get('cookie');
+    const authorization = request.headers.get('authorization');
+
+    if (cookie) headers.set('cookie', cookie);
+    if (authorization) headers.set('authorization', authorization);
+
     const parserResponse = await fetch(`${FLASK_PARSER_URL}/extract-text`, {
       method: 'POST',
       body: flaskFormData,
+      headers: headers,
     });
 
     const responseText = await parserResponse.text();
