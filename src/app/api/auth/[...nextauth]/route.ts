@@ -84,8 +84,17 @@ export const authOptions: NextAuthOptions = {
                 // If user doesn't exist, they will be created by the adapter
                 // We'll mark them as new in the JWT callback
                 if (!existingUser) {
-                    // User will be created by adapter, mark as new
+                    // Mark as new user in the user object (not saved to DB)
+                    // This will be picked up in the JWT callback
                     (user as any).isNewUser = true;
+                } else {
+                    // Mark Google OAuth users as email verified
+                    if (!existingUser.isEmailVerified) {
+                        await prisma.user.update({
+                            where: { id: existingUser.id },
+                            data: { isEmailVerified: true }
+                        });
+                    }
                 }
             }
             return true;
