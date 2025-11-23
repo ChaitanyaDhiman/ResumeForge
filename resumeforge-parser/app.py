@@ -40,6 +40,8 @@ def clean_text(text):
 
 
 @app.route('/', methods=['GET'])
+@app.route('/api/python', methods=['GET'])
+@app.route('/api/python/', methods=['GET'])
 def health_check():
     """Simple endpoint to confirm the Flask service is running."""
     return jsonify({
@@ -48,6 +50,7 @@ def health_check():
     }), 200
 
 @app.route('/extract-text', methods=['POST'])
+@app.route('/api/python/extract-text', methods=['POST'])
 def extract_text_route():
     """
     Receives a file, extracts its clean text, and returns it.

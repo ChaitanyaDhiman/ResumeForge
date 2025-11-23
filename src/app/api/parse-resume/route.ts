@@ -85,14 +85,25 @@ export async function POST(request: Request) {
       body: flaskFormData,
     });
 
+    const responseText = await parserResponse.text();
+    let errorData;
+    try {
+      errorData = JSON.parse(responseText);
+    } catch (e) {
+      console.error("Failed to parse Flask response as JSON. Status:", parserResponse.status);
+      console.error("Response body preview:", responseText.slice(0, 500));
+      return NextResponse.json({
+        error: `Invalid response from Python service (Status ${parserResponse.status}). Check server logs.`
+      }, { status: 500 });
+    }
+
     if (!parserResponse.ok) {
-      const errorData = await parserResponse.json();
       return NextResponse.json({
         error: `File parsing failed in Python service: ${errorData.error}`
       }, { status: parserResponse.status });
     }
 
-    const { clean_text: resumeText } = await parserResponse.json();
+    const { clean_text: resumeText } = errorData;
     const analysisPrompt = generateAnalysisPrompt(resumeText, jobDescription);
 
     const completion = await openai.chat.completions.create({
