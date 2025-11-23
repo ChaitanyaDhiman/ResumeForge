@@ -4,6 +4,7 @@ ResumeForge is an AI-powered resume optimization tool that helps job seekers tai
 
 ## ✨ Features
 
+### Core Functionality
 - **Resume Text Extraction**: Supports PDF and DOCX file formats
 - **AI-Powered Analysis**: Uses OpenAI GPT-4o to analyze resume against job descriptions
 - **Actionable Suggestions**: Provides three types of recommendations:
@@ -11,11 +12,25 @@ ResumeForge is an AI-powered resume optimization tool that helps job seekers tai
   - **REVISE**: Recommendations to improve existing content
   - **REMOVE**: Content that should be removed or replaced
 - **Section-Based Organization**: Suggestions are grouped by resume sections (Experience, Skills, Summary, etc.)
-- **Authentication**: Secure Sign In and Sign Up with Google and Credentials support
+
+### Security & Authentication
+- **Secure Authentication**: Sign In and Sign Up with Google OAuth and email/password credentials
   - **Welcome Messages**: New users receive a friendly welcome toast notification
   - **Auth Protection**: Users must sign in to generate AI-powered suggestions
+  - **Password Strength**: Enforced requirements (8+ chars, uppercase, lowercase, number)
+  - **Email Validation**: Server-side email format validation
+- **Rate Limiting**: Protection against API abuse and DoS attacks
+  - Registration: 5 requests/minute per IP
+  - Resume parsing: 10 requests/minute per user
+- **Input Validation**: Comprehensive validation and sanitization
+  - File type validation (PDF, DOCX only)
+  - File size limits (10MB default, configurable)
+  - XSS prevention through text sanitization
+- **Optimized Database**: Prisma client singleton for improved performance
+
+### User Experience
 - **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
-- **New Pages**: Dedicated pages for "How it works" and "Pricing"
+- **Dedicated Pages**: "How it works", "Pricing", "Sign In", and "Sign Up" pages
 
 ## 🏗️ Architecture
 
