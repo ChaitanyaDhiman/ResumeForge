@@ -59,8 +59,15 @@ export default function UploadForm() {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to optimize resume');
+          let errorMsg = 'Failed to optimize resume';
+          try {
+            const errorData = await response.json();
+            errorMsg = errorData.error || errorMsg;
+          } catch (e) {
+            console.error('Failed to parse error response:', e);
+            errorMsg = `Server Error (${response.status}): The server returned an invalid response.`;
+          }
+          throw new Error(errorMsg);
         }
 
         const data = await response.json();

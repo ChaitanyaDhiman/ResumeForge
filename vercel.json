@@ -15,8 +15,7 @@
             "dest": "/resumeforge-parser/app.py"
         },
         {
-            "src": "/(.*)",
-            "dest": "/$1"
+            "handle": "filesystem"
         }
     ]
 }
