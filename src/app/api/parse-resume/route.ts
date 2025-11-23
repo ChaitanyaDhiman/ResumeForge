@@ -88,6 +88,11 @@ export async function POST(request: Request) {
     if (cookie) headers.set('cookie', cookie);
     if (authorization) headers.set('authorization', authorization);
 
+    // Support for Vercel Automation Bypass
+    if (process.env.VERCEL_AUTOMATION_BYPASS_SECRET) {
+      headers.set('x-vercel-protection-bypass', process.env.VERCEL_AUTOMATION_BYPASS_SECRET);
+    }
+
     const parserResponse = await fetch(`${FLASK_PARSER_URL}/extract-text`, {
       method: 'POST',
       body: flaskFormData,

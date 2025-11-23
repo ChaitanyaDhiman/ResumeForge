@@ -31,6 +31,25 @@ The project is already configured with a `vercel.json` file that handles the bui
 
 4.  **Deploy**: Click "Deploy".
 
+## Troubleshooting: "Authentication Required" Error
+
+If you see an error saying "Authentication Required" or "Failed to parse Flask response as JSON" with HTML content, it means Vercel's **Deployment Protection** is blocking the API route from talking to the backend.
+
+**Solution 1: Disable Vercel Authentication (Easiest)**
+1.  Go to your Vercel Project Dashboard.
+2.  Navigate to **Settings** > **Deployment Protection**.
+3.  Find **Vercel Authentication**.
+4.  Toggle it **OFF** (or disable it for the specific environment you are testing).
+5.  Save changes.
+
+**Solution 2: Use a Bypass Secret (Secure)**
+1.  Go to **Settings** > **Deployment Protection** > **Vercel Authentication**.
+2.  Click "Manage" or look for "Bypass for Automation".
+3.  Generate a secret.
+4.  Go to **Settings** > **Environment Variables**.
+5.  Add a new variable named `VERCEL_AUTOMATION_BYPASS_SECRET` with the value of the secret you generated.
+6.  Redeploy your application.
+
 ## Verification
 
 After deployment:
