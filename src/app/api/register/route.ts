@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { hash } from 'bcryptjs';
 import { prisma } from '@/lib/db';
-import { isValidEmail, isStrongPassword } from '@/lib/validation';
+import { isValidEmail, isStrongPassword, sanitizeText } from '@/lib/validation';
 import { rateLimit, RATE_LIMITS } from '@/lib/ratelimit';
 import { generateOtp, createOtpToken } from '@/lib/otp';
 import { sendOtpEmail } from '@/lib/email';
@@ -60,18 +60,21 @@ export async function POST(req: Request) {
 
         if (existingUser) {
             return NextResponse.json(
-                { message: 'User already exists' },
-                { status: 409 }
+                { message: 'User with this email already exists' },
+                { status: 400 }
             );
         }
 
         // 6. Hash password
         const hashedPassword = await hash(password, 12);
 
+        // Sanitize name to prevent XSS
+        const sanitizedName = sanitizeText(name, 100);
+
         // 7. Create user
         const user = await prisma.user.create({
             data: {
-                name: name || null,
+                name: sanitizedName,
                 email,
                 password: hashedPassword,
             },

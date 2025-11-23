@@ -25,7 +25,7 @@ export async function sendOtpEmail(email: string, otp: string): Promise<void> {
     }
 
     const body = {
-        from: 'ResumeForge <no-reply@resumeforge.com>',
+        from: 'ResumeForge <no-reply@chaitanyadhiman.com>',
         to: email,
         subject: 'Your ResumeForge verification code',
         html: `

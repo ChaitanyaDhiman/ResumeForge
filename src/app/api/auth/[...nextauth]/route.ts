@@ -73,28 +73,17 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async signIn({ user, account, profile }) {
-            // This callback is called when a user signs in
-            // For OAuth providers, we can check if this is a new user
-            if (account?.provider === "google") {
-                // Check if user already exists in database
+            // For Google OAuth, mark existing users as email verified
+            if (account?.provider === "google" && user.email) {
                 const existingUser = await prisma.user.findUnique({
-                    where: { email: user.email! }
+                    where: { email: user.email }
                 });
 
-                // If user doesn't exist, they will be created by the adapter
-                // We'll mark them as new in the JWT callback
-                if (!existingUser) {
-                    // Mark as new user in the user object (not saved to DB)
-                    // This will be picked up in the JWT callback
-                    (user as any).isNewUser = true;
-                } else {
-                    // Mark Google OAuth users as email verified
-                    if (!existingUser.isEmailVerified) {
-                        await prisma.user.update({
-                            where: { id: existingUser.id },
-                            data: { isEmailVerified: true }
-                        });
-                    }
+                if (existingUser && !existingUser.isEmailVerified) {
+                    await prisma.user.update({
+                        where: { id: existingUser.id },
+                        data: { isEmailVerified: true }
+                    });
                 }
             }
             return true;
@@ -113,9 +102,27 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
                 token.isEmailVerified = (user as any).isEmailVerified ?? false;
-                // Check if this is a new user (marked in signIn callback)
-                if ((user as any).isNewUser) {
-                    token.isNewUser = true;
+
+                // For OAuth users, auto-verify email and mark as new user on first sign-in
+                if (account?.provider === "google") {
+                    const dbUser = await prisma.user.findUnique({
+                        where: { id: user.id }
+                    });
+
+                    if (dbUser) {
+                        // Auto-verify Google OAuth users
+                        if (!dbUser.isEmailVerified) {
+                            await prisma.user.update({
+                                where: { id: user.id },
+                                data: { isEmailVerified: true }
+                            });
+                            token.isEmailVerified = true;
+                            // This is a new user (first time signing in)
+                            token.isNewUser = true;
+                        } else {
+                            token.isNewUser = false;
+                        }
+                    }
                 } else {
                     token.isNewUser = false;
                 }
