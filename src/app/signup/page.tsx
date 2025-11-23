@@ -11,17 +11,37 @@ export default function SignUp() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSignUp = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
 
-        // Simulate API call for registration
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        try {
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name,
+                    email,
+                    password,
+                }),
+            });
 
-        setIsLoading(false);
-        // Redirect to sign in page after successful "registration"
-        router.push('/signin');
+            if (res.ok) {
+                router.push('/signin');
+            } else {
+                const data = await res.json();
+                setError(data.message || 'Registration failed');
+            }
+        } catch (error) {
+            setError('An error occurred. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleGoogleSignUp = async () => {
@@ -30,10 +50,16 @@ export default function SignUp() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F0F5FF] flex items-center justify-center px-6 py-12">
-            <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden">
+            {/* Background Blobs */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
+                <div className="absolute top-[10%] right-[10%] w-[500px] h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />
+                <div className="absolute bottom-[10%] left-[10%] w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
+            </div>
+
+            <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-500/10 border border-white/50 p-8 md:p-12 w-full max-w-md relative z-10">
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white mb-4">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white mb-4 shadow-lg shadow-indigo-500/30">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                             <circle cx="8.5" cy="7" r="4" />
@@ -41,13 +67,19 @@ export default function SignUp() {
                             <line x1="23" y1="11" x2="17" y2="11" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
-                    <p className="text-gray-600 mt-2">Join ResumeForge to start optimizing</p>
+                    <h1 className="text-3xl font-bold text-slate-900">Create Account</h1>
+                    <p className="text-slate-600 mt-2">Join ResumeForge to start optimizing</p>
                 </div>
+
+                {error && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm text-center">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleSignUp} className="space-y-6">
                     <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
                             Full Name
                         </label>
                         <input
@@ -56,13 +88,13 @@ export default function SignUp() {
                             required
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-gray-900"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400"
                             placeholder="John Doe"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                             Email Address
                         </label>
                         <input
@@ -71,13 +103,13 @@ export default function SignUp() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-gray-900"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400"
                             placeholder="you@example.com"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                             Password
                         </label>
                         <input
@@ -86,7 +118,7 @@ export default function SignUp() {
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-gray-900"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400"
                             placeholder="••••••••"
                         />
                     </div>
@@ -94,7 +126,7 @@ export default function SignUp() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-colors shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                         {isLoading ? (
                             <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -105,10 +137,10 @@ export default function SignUp() {
 
                     <div className="relative my-8">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200"></div>
+                            <div className="w-full border-t border-slate-200"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+                            <span className="px-2 bg-white/50 backdrop-blur-sm text-slate-500">Or sign up with</span>
                         </div>
                     </div>
 
@@ -117,7 +149,7 @@ export default function SignUp() {
                             type="button"
                             onClick={handleGoogleSignUp}
                             disabled={isLoading}
-                            className="w-full bg-white border border-gray-200 text-gray-700 font-semibold py-3.5 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-3"
+                            className="w-full bg-white border border-slate-200 text-slate-700 font-semibold py-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-center gap-3 shadow-sm"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path
@@ -142,9 +174,9 @@ export default function SignUp() {
                     </div>
                 </form>
 
-                <p className="text-center mt-8 text-gray-600">
+                <p className="text-center mt-8 text-slate-600">
                     Already have an account?{' '}
-                    <Link href="/signin" className="text-blue-600 font-bold hover:text-blue-700">
+                    <Link href="/signin" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors">
                         Sign in
                     </Link>
                 </p>

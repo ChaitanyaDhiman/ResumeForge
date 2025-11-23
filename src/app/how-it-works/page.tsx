@@ -41,30 +41,36 @@ export default function HowItWorks() {
     ];
 
     return (
-        <div className="min-h-screen bg-[#F0F5FF] py-20 px-6">
-            <div className="max-w-4xl mx-auto">
+        <div className="min-h-screen py-20 px-6 relative overflow-hidden">
+            {/* Background Blobs */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
+                <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />
+                <div className="absolute bottom-[10%] right-[-10%] w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
+            </div>
+
+            <div className="max-w-4xl mx-auto relative z-10">
                 <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
                         How ResumeForge Works
                     </h1>
-                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                    <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
                         Optimize your resume in three simple steps and increase your chances of landing an interview.
                     </p>
                 </div>
 
                 <div className="grid gap-8 md:grid-cols-3">
                     {steps.map((step) => (
-                        <div key={step.number} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow border border-blue-50">
-                            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-6">
+                        <div key={step.number} className="bg-white/70 backdrop-blur-xl rounded-2xl p-8 shadow-xl shadow-indigo-500/5 border border-white/50 hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300">
+                            <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 text-indigo-600">
                                 {step.icon}
                             </div>
                             <div className="flex items-center gap-3 mb-4">
-                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm">
+                                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600 text-white font-bold text-sm shadow-lg shadow-indigo-500/30">
                                     {step.number}
                                 </span>
-                                <h3 className="text-xl font-bold text-gray-900">{step.title}</h3>
+                                <h3 className="text-xl font-bold text-slate-900">{step.title}</h3>
                             </div>
-                            <p className="text-gray-600 leading-relaxed">
+                            <p className="text-slate-600 leading-relaxed">
                                 {step.description}
                             </p>
                         </div>
@@ -74,7 +80,7 @@ export default function HowItWorks() {
                 <div className="mt-16 text-center">
                     <a
                         href="/"
-                        className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all"
+                        className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:-translate-y-1"
                     >
                         Start Optimizing Now
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2">

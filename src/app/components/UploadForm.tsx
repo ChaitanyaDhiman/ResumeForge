@@ -88,71 +88,78 @@ export default function UploadForm() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center px-4 w-full">
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          Beat the ATS.
-          <br />
-          Land the Interview.
-        </h1>
-        <p className="text-lg text-gray-600">
-          AI-powered resume optimization tailored to any job description
-        </p>
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Progress Steps */}
+      <div className="flex items-center justify-center gap-4 mb-12">
+        {[
+          { step: 1, label: 'Upload' },
+          { step: 2, label: 'Optimize' },
+          { step: 3, label: 'Suggestions' }
+        ].map((item, index) => (
+          <div key={item.step} className="flex items-center">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${currentStep >= item.step
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+                : 'bg-white/50 text-slate-400'
+              }`}>
+              <span className="font-bold">{item.step}</span>
+              <span className="font-medium hidden md:block">{item.label}</span>
+            </div>
+            {index < 2 && (
+              <div className={`w-12 h-0.5 mx-2 ${currentStep > item.step ? 'bg-indigo-200' : 'bg-slate-200'
+                }`} />
+            )}
+          </div>
+        ))}
       </div>
 
-      <div className="flex items-center justify-center gap-4 mb-12 text-sm font-medium">
-        <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'}`}>1</div>
-          <span className={`${currentStep >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>Upload</span>
-        </div>
-        <div className={`w-12 h-0.5 ${currentStep >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-        <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'}`}>2</div>
-          <span className={`${currentStep >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>Optimize</span>
-        </div>
-        <div className={`w-12 h-0.5 ${currentStep >= 3 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-        <div className="flex items-center gap-2">
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'}`}>3</div>
-          <span className={`${currentStep >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>Suggestions</span>
-        </div>
-      </div>
-
-      <div className="w-full max-w-4xl">
+      <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-500/10 border border-white/50 p-8 md:p-12 transition-all">
         {error && (
-          <div className="mb-8 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-center">
+          <div className="mb-8 p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-center flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
             {error}
           </div>
         )}
 
         {isLoading ? (
-          <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
-            <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-6"></div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">Processing...</h2>
-            <p className="text-gray-600">Please wait while we process your request.</p>
+          <div className="text-center py-12">
+            <div className="relative w-20 h-20 mx-auto mb-8">
+              <div className="absolute inset-0 border-4 border-indigo-100 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-2">Analyzing your resume...</h2>
+            <p className="text-slate-500">Our AI is finding the best keywords for you.</p>
           </div>
         ) : (
           <>
             {currentStep === 1 && (
-              <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 max-w-2xl mx-auto">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-8">Upload Your Resume</h2>
-
+              <div className="text-center">
                 <div
-                  className="border-2 border-dashed border-blue-200 rounded-xl p-12 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-blue-50 transition-colors"
+                  className={`group border-3 border-dashed rounded-2xl p-12 transition-all cursor-pointer ${file
+                      ? 'border-indigo-500 bg-indigo-50/50'
+                      : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50/50'
+                    }`}
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
                   onClick={() => document.getElementById('file-upload')?.click()}
                 >
-                  <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 text-blue-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="17 8 12 3 7 8" />
-                      <line x1="12" y1="3" x2="12" y2="15" />
-                    </svg>
+                  <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 transition-colors ${file ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-500'
+                    }`}>
+                    {file ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" /><polyline points="14 2 14 8 20 8" /></svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+                    )}
                   </div>
-                  <p className="text-gray-900 font-medium mb-2">
-                    {file ? file.name : 'Drop your resume here or click to browse'}
+
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                    {file ? file.name : 'Upload your resume'}
+                  </h3>
+                  <p className="text-slate-500 mb-6">
+                    {file ? 'Click to change file' : 'Drag & drop or click to browse'}
                   </p>
-                  <p className="text-gray-500 text-sm">PDF, DOC, DOCX up to 10MB</p>
+                  <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+                    PDF, DOCX up to 10MB
+                  </p>
                   <input
                     id="file-upload"
                     type="file"
@@ -165,11 +172,13 @@ export default function UploadForm() {
             )}
 
             {currentStep === 2 && (
-              <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 max-w-2xl mx-auto">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-8">Paste Job Description</h2>
+              <div className="h-full">
+                <label className="block text-sm font-semibold text-slate-700 mb-4 ml-1">
+                  Job Description
+                </label>
                 <textarea
-                  className="w-full h-64 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none mb-4 text-gray-900 placeholder-gray-400"
-                  placeholder="Paste the job description here..."
+                  className="w-full h-80 p-6 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-slate-900 placeholder-slate-400 transition-all text-base leading-relaxed"
+                  placeholder="Paste the full job description here..."
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                 />
@@ -180,11 +189,11 @@ export default function UploadForm() {
               <SuggestionDisplay suggestions={suggestions} />
             )}
 
-            <div className="flex gap-4 mt-8 max-w-2xl mx-auto">
+            <div className="flex gap-4 mt-10">
               {currentStep > 1 && (
                 <button
                   onClick={handleBack}
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold py-4 rounded-xl transition-colors"
+                  className="px-8 py-4 rounded-xl font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
                 >
                   Back
                 </button>
@@ -193,13 +202,10 @@ export default function UploadForm() {
                 <button
                   onClick={handleContinue}
                   disabled={currentStep === 1 && !file || currentStep === 2 && !jobDescription.trim()}
-                  className={`flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-xl transition-colors flex items-center justify-center gap-2 ${(currentStep === 1 && !file || currentStep === 2 && !jobDescription.trim()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 hover:translate-y-[-2px] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:shadow-none`}
                 >
-                  {currentStep === 2 ? 'Optimize' : 'Continue'}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
+                  {currentStep === 2 ? 'Generate Suggestions' : 'Continue'}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
                 </button>
               )}
             </div>

@@ -11,9 +11,12 @@ export default function SignIn() {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    const [error, setError] = useState('');
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
 
         const result = await signIn('credentials', {
             redirect: false,
@@ -24,7 +27,7 @@ export default function SignIn() {
         setIsLoading(false);
 
         if (result?.error) {
-            alert("Invalid credentials.");
+            setError("Invalid email or password.");
         } else {
             router.push('/');
         }
@@ -36,23 +39,35 @@ export default function SignIn() {
     };
 
     return (
-        <div className="min-h-screen bg-[#F0F5FF] flex items-center justify-center px-6 py-12">
-            <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden">
+            {/* Background Blobs */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
+                <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />
+                <div className="absolute bottom-[10%] right-[10%] w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
+            </div>
+
+            <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-500/10 border border-white/50 p-8 md:p-12 w-full max-w-md relative z-10">
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-600 text-white mb-4">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white mb-4 shadow-lg shadow-indigo-500/30">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
                             <polyline points="10 17 15 12 10 7" />
                             <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900">Welcome Back</h1>
-                    <p className="text-gray-600 mt-2">Sign in to continue optimizing your resume</p>
+                    <h1 className="text-3xl font-bold text-slate-900">Welcome Back</h1>
+                    <p className="text-slate-600 mt-2">Sign in to continue optimizing your resume</p>
                 </div>
+
+                {error && (
+                    <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm text-center">
+                        {error}
+                    </div>
+                )}
 
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                             Email Address
                         </label>
                         <input
@@ -61,17 +76,17 @@ export default function SignIn() {
                             required
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-gray-900"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400"
                             placeholder="you@example.com"
                         />
                     </div>
 
                     <div>
                         <div className="flex items-center justify-between mb-2">
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="password" className="block text-sm font-medium text-slate-700">
                                 Password
                             </label>
-                            <a href="#" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                            <a href="#" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium transition-colors">
                                 Forgot password?
                             </a>
                         </div>
@@ -81,7 +96,7 @@ export default function SignIn() {
                             required
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-gray-900"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-slate-900 placeholder-slate-400"
                             placeholder="••••••••"
                         />
                     </div>
@@ -89,7 +104,7 @@ export default function SignIn() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-colors shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
                     >
                         {isLoading ? (
                             <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -100,10 +115,10 @@ export default function SignIn() {
 
                     <div className="relative my-8">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200"></div>
+                            <div className="w-full border-t border-slate-200"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                            <span className="px-2 bg-white/50 backdrop-blur-sm text-slate-500">Or continue with</span>
                         </div>
                     </div>
 
@@ -112,7 +127,7 @@ export default function SignIn() {
                             type="button"
                             onClick={handleGoogleLogin}
                             disabled={isLoading}
-                            className="w-full bg-white border border-gray-200 text-gray-700 font-semibold py-3.5 rounded-xl hover:bg-gray-50 transition-colors flex items-center justify-center gap-3"
+                            className="w-full bg-white border border-slate-200 text-slate-700 font-semibold py-3.5 rounded-xl hover:bg-slate-50 transition-colors flex items-center justify-center gap-3 shadow-sm"
                         >
                             <svg className="w-5 h-5" viewBox="0 0 24 24">
                                 <path
@@ -137,9 +152,9 @@ export default function SignIn() {
                     </div>
                 </form>
 
-                <p className="text-center mt-8 text-gray-600">
+                <p className="text-center mt-8 text-slate-600">
                     Don't have an account?{' '}
-                    <Link href="/signup" className="text-blue-600 font-bold hover:text-blue-700">
+                    <Link href="/signup" className="text-indigo-600 font-bold hover:text-indigo-700 transition-colors">
                         Sign up
                     </Link>
                 </p>
