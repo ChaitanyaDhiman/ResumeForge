@@ -12,6 +12,8 @@ ResumeForge is an AI-powered resume optimization tool that helps job seekers tai
   - **REMOVE**: Content that should be removed or replaced
 - **Section-Based Organization**: Suggestions are grouped by resume sections (Experience, Skills, Summary, etc.)
 - **Authentication**: Secure Sign In and Sign Up with Google and Credentials support
+  - **Welcome Messages**: New users receive a friendly welcome toast notification
+  - **Auth Protection**: Users must sign in to generate AI-powered suggestions
 - **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
 - **New Pages**: Dedicated pages for "How it works" and "Pricing"
 
@@ -65,13 +67,25 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 4. Configure Environment Variables
+### 4. Set Up Database
+
+ResumeForge uses **PostgreSQL** with **Prisma ORM** for user authentication and data storage.
+
+Follow the detailed guide in [DATABASE_SETUP.md](./DATABASE_SETUP.md) to:
+- Create a PostgreSQL database (Vercel, Supabase, Neon, or any provider)
+- Configure your `DATABASE_URL` environment variable
+- Push the database schema
+
+### 5. Configure Environment Variables
 
 Create a `.env.local` file in the root directory:
 
 ```env
 # AI Configuration
 OPENAI_API_KEY=your_openai_api_key_here
+
+# Database (PostgreSQL)
+DATABASE_URL=postgresql://username:password@host:port/database?schema=public
 
 # Authentication (NextAuth.js)
 NEXTAUTH_URL=http://localhost:3000
@@ -80,9 +94,11 @@ GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 ```
 
+**Note**: For Google Authentication setup, see [GOOGLE_AUTH_SETUP.md](./GOOGLE_AUTH_SETUP.md).
+
 The Flask service will automatically use environment variables from `.env` if present, or you can set them directly.
 
-### 5. Start the Flask Parser Service
+### 6. Start the Flask Parser Service
 
 In the `resumeforge-parser` directory (with venv activated):
 
@@ -92,7 +108,7 @@ python app.py
 
 The Flask service will start on `http://localhost:5001`
 
-### 6. Start the Next.js Development Server
+### 7. Start the Next.js Development Server
 
 In the root directory:
 
@@ -136,6 +152,8 @@ resumeforge-app/
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
 - **NextAuth.js** - Authentication
+- **Prisma v5** - Database ORM
+- **PostgreSQL** - Database
 - **OpenAI SDK** - AI integration
 
 ### Backend
@@ -174,6 +192,7 @@ resumeforge-app/
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `OPENAI_API_KEY` | Your OpenAI API key for GPT-4o access | Yes |
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
 | `NEXTAUTH_URL` | URL of your Next.js app (e.g., http://localhost:3000) | Yes |
 | `NEXTAUTH_SECRET` | Random string for session encryption | Yes |
 | `GOOGLE_CLIENT_ID` | Google OAuth Client ID | Yes (for Google Login) |

@@ -1,8 +1,74 @@
+'use client';
+
+import { useEffect, useState, Suspense } from 'react';
+import { useSession } from 'next-auth/react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import UploadForm from './components/UploadForm';
+
+function WelcomeMessage() {
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    // Check for welcome parameter in URL or isNewUser flag in session
+    const welcomeParam = searchParams.get('welcome');
+    const isNewUser = (session?.user as any)?.isNewUser;
+
+    if (welcomeParam === 'true' || isNewUser) {
+      setShowWelcome(true);
+
+      // Clear the welcome parameter from URL if present
+      if (welcomeParam) {
+        const newUrl = window.location.pathname;
+        router.replace(newUrl);
+      }
+
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        setShowWelcome(false);
+      }, 5000);
+    }
+  }, [searchParams, session, router]);
+
+  if (!showWelcome) return null;
+
+  return (
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-slide-down">
+      <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl shadow-indigo-500/20 border border-indigo-100 px-6 py-4 flex items-center gap-3">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-100">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-600">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+        </div>
+        <div>
+          <p className="font-bold text-slate-900">Welcome to ResumeForge! 🎉</p>
+          <p className="text-sm text-slate-600">Let's optimize your resume and land that interview.</p>
+        </div>
+        <button
+          onClick={() => setShowWelcome(false)}
+          className="ml-4 text-slate-400 hover:text-slate-600 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
     <main className="min-h-screen relative overflow-hidden">
+      {/* Welcome Toast */}
+      <Suspense fallback={null}>
+        <WelcomeMessage />
+      </Suspense>
+
       {/* Background Blobs */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />

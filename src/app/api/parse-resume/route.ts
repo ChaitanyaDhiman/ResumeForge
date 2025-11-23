@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
+import { validateFile, sanitizeText } from '@/lib/validation';
+import { rateLimit, RATE_LIMITS } from '@/lib/ratelimit';
 
 interface Suggestion {
   type: 'ADD' | 'REVISE' | 'REMOVE';
@@ -67,6 +71,34 @@ const FLASK_PARSER_URL = process.env.FLASK_PARSER_URL || (process.env.VERCEL_URL
 
 export async function POST(request: Request) {
   try {
+    // 1. Authentication check
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'Authentication required. Please sign in to use this feature.' },
+        { status: 401 }
+      );
+    }
+
+    // 2. Rate limiting
+    const userEmail = session.user.email || 'anonymous';
+    const rateLimitResult = rateLimit(userEmail, RATE_LIMITS.PARSE_RESUME);
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please try again later.' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': RATE_LIMITS.PARSE_RESUME.maxRequests.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime).toISOString(),
+          }
+        }
+      );
+    }
+
+    // 3. Parse and validate input
     const formData = await request.formData();
     const resumeFile = formData.get('resumeFile');
     const jobDescription = formData.get('jobDescription') as string;
@@ -74,6 +106,19 @@ export async function POST(request: Request) {
     if (!resumeFile || typeof resumeFile === 'string') {
       return NextResponse.json({ error: 'Resume file is missing or invalid' }, { status: 400 });
     }
+
+    if (!jobDescription || jobDescription.trim().length === 0) {
+      return NextResponse.json({ error: 'Job description is required' }, { status: 400 });
+    }
+
+    // 4. Validate file
+    const fileValidation = validateFile(resumeFile as File);
+    if (!fileValidation.valid) {
+      return NextResponse.json({ error: fileValidation.message }, { status: 400 });
+    }
+
+    // 5. Sanitize job description
+    const sanitizedJobDescription = sanitizeText(jobDescription, 20000);
 
     const flaskFormData = new FormData();
     flaskFormData.append('file', resumeFile);
@@ -118,7 +163,7 @@ export async function POST(request: Request) {
     }
 
     const { clean_text: resumeText } = errorData;
-    const analysisPrompt = generateAnalysisPrompt(resumeText, jobDescription);
+    const analysisPrompt = generateAnalysisPrompt(resumeText, sanitizedJobDescription);
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',

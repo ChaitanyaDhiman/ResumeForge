@@ -27,6 +27,11 @@ The project is already configured with a `vercel.json` file that handles the bui
 3.  **Environment Variables**:
     - In the "Configure Project" step, add the following environment variables:
         - `OPENAI_API_KEY`: Your OpenAI API key.
+        - `DATABASE_URL`: Your PostgreSQL connection string (see [DATABASE_SETUP.md](./DATABASE_SETUP.md)).
+        - `NEXTAUTH_URL`: Your Vercel deployment URL (e.g., `https://resumeforge.vercel.app`).
+        - `NEXTAUTH_SECRET`: A random secret string (generate with `openssl rand -base64 32`).
+        - `GOOGLE_CLIENT_ID`: Your Google OAuth Client ID (see [GOOGLE_AUTH_SETUP.md](./GOOGLE_AUTH_SETUP.md)).
+        - `GOOGLE_CLIENT_SECRET`: Your Google OAuth Client Secret.
         - `FLASK_PARSER_URL`: (Optional) You can leave this empty, and it will default to the Vercel deployment URL + `/api/python`. If you need to override it, you can set it here.
 
 4.  **Deploy**: Click "Deploy".

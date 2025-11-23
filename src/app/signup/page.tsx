@@ -32,7 +32,20 @@ export default function SignUp() {
             });
 
             if (res.ok) {
-                router.push('/signin');
+                // Auto sign-in the user after successful registration
+                const result = await signIn('credentials', {
+                    email,
+                    password,
+                    redirect: false,
+                });
+
+                if (result?.ok) {
+                    // Redirect to homepage with welcome flag
+                    router.push('/?welcome=true');
+                } else {
+                    // If auto sign-in fails, redirect to sign-in page
+                    router.push('/signin');
+                }
             } else {
                 const data = await res.json();
                 setError(data.message || 'Registration failed');

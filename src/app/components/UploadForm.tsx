@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import SuggestionDisplay from './SuggestionDisplay';
 
 interface Suggestion {
@@ -17,12 +19,15 @@ interface LLMSuggestions {
 }
 
 export default function UploadForm() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [jobDescription, setJobDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<LLMSuggestions | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showSignInModal, setShowSignInModal] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -45,6 +50,12 @@ export default function UploadForm() {
     if (currentStep === 1 && file) {
       setCurrentStep(2);
     } else if (currentStep === 2 && jobDescription.trim()) {
+      // Check if user is authenticated before generating suggestions
+      if (status === 'unauthenticated') {
+        setShowSignInModal(true);
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
 
@@ -89,6 +100,50 @@ export default function UploadForm() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
+      {/* Sign-In Modal */}
+      {showSignInModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative animate-scale-in">
+            <button
+              onClick={() => setShowSignInModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-600">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                  <polyline points="10 17 15 12 10 7"></polyline>
+                  <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Sign In Required</h2>
+              <p className="text-slate-600">Please sign in to generate AI-powered resume suggestions</p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push('/signin?callbackUrl=/')}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => router.push('/signup')}
+                className="w-full bg-white border-2 border-slate-200 text-slate-700 font-bold py-4 rounded-xl hover:bg-slate-50 transition-colors"
+              >
+                Create Account
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Progress Steps */}
       <div className="flex items-center justify-center gap-4 mb-12">
         {[
@@ -98,8 +153,8 @@ export default function UploadForm() {
         ].map((item, index) => (
           <div key={item.step} className="flex items-center">
             <div className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${currentStep >= item.step
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
-                : 'bg-white/50 text-slate-400'
+              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
+              : 'bg-white/50 text-slate-400'
               }`}>
               <span className="font-bold">{item.step}</span>
               <span className="font-medium hidden md:block">{item.label}</span>
@@ -135,8 +190,8 @@ export default function UploadForm() {
               <div className="text-center">
                 <div
                   className={`group border-3 border-dashed rounded-2xl p-12 transition-all cursor-pointer ${file
-                      ? 'border-indigo-500 bg-indigo-50/50'
-                      : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50/50'
+                    ? 'border-indigo-500 bg-indigo-50/50'
+                    : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50/50'
                     }`}
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
