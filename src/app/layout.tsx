@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ResumeForge",
+  title: "ResumeForge - AI Powered Resume Optimization",
   description: "ResumeForge is an AI-powered resume optimization tool that helps job seekers tailor their resumes to specific job descriptions.",
 };
 

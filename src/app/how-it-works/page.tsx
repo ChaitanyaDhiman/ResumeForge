@@ -41,24 +41,24 @@ export default function HowItWorks() {
     ];
 
     return (
-        <div className="min-h-screen py-20 px-6 relative overflow-hidden">
+        <div className="min-h-screen py-12 sm:py-20 px-4 sm:px-6 relative overflow-hidden">
             {/* Background Blobs */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
-                <div className="absolute top-[10%] left-[-10%] w-[500px] h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />
-                <div className="absolute bottom-[10%] right-[-10%] w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
+                <div className="absolute top-[10%] left-[-10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />
+                <div className="absolute bottom-[10%] right-[-10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-violet-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
             </div>
 
             <div className="max-w-4xl mx-auto relative z-10">
-                <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
+                <div className="text-center mb-12 sm:mb-16">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-4 sm:mb-6">
                         How ResumeForge Works
                     </h1>
-                    <p className="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                    <p className="text-base sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed px-4">
                         Optimize your resume in three simple steps and increase your chances of landing an interview.
                     </p>
                 </div>
 
-                <div className="grid gap-8 md:grid-cols-3">
+                <div className="grid gap-6 sm:gap-8 md:grid-cols-3">
                     {steps.map((step) => (
                         <div key={step.number} className="bg-white/70 backdrop-blur-xl rounded-2xl p-8 shadow-xl shadow-indigo-500/5 border border-white/50 hover:shadow-indigo-500/10 hover:-translate-y-1 transition-all duration-300">
                             <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 text-indigo-600">

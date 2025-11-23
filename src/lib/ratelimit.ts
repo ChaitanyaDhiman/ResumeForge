@@ -1,5 +1,6 @@
 // Simple in-memory rate limiter for development
-// For production, use Upstash Redis or similar
+// ⚠️ WARNING: For production, use a distributed solution like Upstash Redis or Vercel KV
+// In-memory storage will not work across multiple serverless instances
 
 interface RateLimitStore {
     [key: string]: {
@@ -25,7 +26,43 @@ export interface RateLimitConfig {
     windowMs: number;
 }
 
+/**
+ * Extracts the real IP address from request headers
+ * Handles various proxy headers in order of priority
+ */
+export function extractIpAddress(request: Request): string {
+    const headers = request.headers;
+
+    // Check various headers in order of reliability
+    const forwardedFor = headers.get('x-forwarded-for');
+    if (forwardedFor) {
+        // x-forwarded-for can contain multiple IPs, take the first one
+        return forwardedFor.split(',')[0].trim();
+    }
+
+    const realIp = headers.get('x-real-ip');
+    if (realIp) {
+        return realIp;
+    }
+
+    const cfConnectingIp = headers.get('cf-connecting-ip'); // Cloudflare
+    if (cfConnectingIp) {
+        return cfConnectingIp;
+    }
+
+    return 'unknown';
+}
+
 export function rateLimit(identifier: string, config: RateLimitConfig): { success: boolean; remaining: number; resetTime: number } {
+    // Allow bypass for testing if environment variable is set
+    if (process.env.RATE_LIMIT_BYPASS === 'true' && process.env.NODE_ENV !== 'production') {
+        return {
+            success: true,
+            remaining: config.maxRequests,
+            resetTime: Date.now() + config.windowMs,
+        };
+    }
+
     const now = Date.now();
     const key = identifier;
 
@@ -68,5 +105,6 @@ export const RATE_LIMITS = {
     PARSE_RESUME: { maxRequests: 10, windowMs: 60 * 1000 },
     // 20 requests per minute for general API
     GENERAL: { maxRequests: 20, windowMs: 60 * 1000 },
+    // 5 requests per 10 minutes for OTP resend
     RESEND_OTP: { maxRequests: 5, windowMs: 10 * 60 * 1000 }
 };

@@ -17,9 +17,21 @@ ResumeForge is an AI-powered resume optimization tool that helps job seekers tai
 - **Secure Authentication**: Sign In and Sign Up with Google OAuth and email/password credentials
   - **Welcome Messages**: New users receive a friendly welcome toast notification
   - **Auth Protection**: Users must sign in to generate AI-powered suggestions
-  - **Password Strength**: Enforced requirements (8+ chars, uppercase, lowercase, number)
-  - **Email Validation**: Server-side email format validation
-  - **Email Verification**: OTP-based verification for new registrations (powered by Resend)
+  - **Password Strength**: Enforced requirements (8+ chars, uppercase, lowercase, number, special character)
+  - **Email Validation**: Strict RFC 5322 compliant email validation
+  - **Email Verification**: OTP-based verification with retry logic (powered by Resend)
+- **Security Headers**: Comprehensive protection via Next.js middleware
+  - **Content Security Policy (CSP)**: Restricts resource loading to trusted sources
+  - **X-Frame-Options**: Prevents clickjacking attacks
+  - **X-Content-Type-Options**: Prevents MIME type sniffing
+  - **HSTS**: Enforces HTTPS in production
+  - **Referrer-Policy**: Controls referrer information
+  - **Permissions-Policy**: Restricts browser features
+- **Session Security**:
+  - JWT-based sessions with 30-day expiration
+  - Secure, HTTP-only cookies with SameSite protection
+  - CSRF protection enabled
+  - Session sliding (auto-renewal on activity)
 - **Usage Limits**:
   - **Monthly Quota**: 3 resume optimizations per user per month
   - **Usage Tracking**: Real-time tracking of optimization requests
@@ -28,16 +40,24 @@ ResumeForge is an AI-powered resume optimization tool that helps job seekers tai
   - Resume parsing: 10 requests/minute per user
   - OTP Resend: 5 requests/10 minutes per email
 - **Input Validation**: Comprehensive validation and sanitization
-  - File type validation (PDF, DOCX only)
+  - File type validation (PDF, DOCX only - MIME type + extension)
   - File size limits (10MB default, configurable)
-  - XSS prevention through text sanitization
+  - Enhanced XSS prevention (removes scripts, event handlers, data URIs)
+  - Email format validation with additional checks
 - **Optimized Database**: Prisma client singleton for improved performance
+
+> **Security Note**: For detailed security information, see [SECURITY.md](./SECURITY.md)
 
 ### Authentication Flow
 ![Email Verification & OTP Flow](/email_otp_flow.png)
 
 ### User Experience
 - **Modern UI**: Clean, responsive interface built with Next.js and Tailwind CSS
+- **Mobile Responsive**: Fully optimized for all device sizes
+  - Responsive navigation with hamburger menu
+  - Touch-friendly buttons (44x44px minimum)
+  - Optimized typography and spacing for mobile
+  - Tested on iPhone SE, iPhone 12/13, iPad, and desktop
 - **Dedicated Pages**: "How it works", "Pricing", "Sign In", and "Sign Up" pages
 
 ## 🏗️ Architecture
@@ -212,15 +232,28 @@ resumeforge-app/
 
 ## 🔒 Environment Variables
 
+### Required Variables
+
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `OPENAI_API_KEY` | Your OpenAI API key for GPT-4o access | Yes |
 | `DATABASE_URL` | PostgreSQL connection string | Yes |
 | `NEXTAUTH_URL` | URL of your Next.js app (e.g., http://localhost:3000) | Yes |
-| `NEXTAUTH_SECRET` | Random string for session encryption | Yes |
+| `NEXTAUTH_SECRET` | Random string for session encryption (generate with `openssl rand -base64 32`) | Yes |
 | `GOOGLE_CLIENT_ID` | Google OAuth Client ID | Yes (for Google Login) |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret | Yes (for Google Login) |
-| `FLASK_RUN_PORT` | Port for Flask service (default: 5001) | No |
+| `RESEND_API_KEY` | Resend API key for sending emails | Yes |
+
+### Optional Variables
+
+| Variable | Description | Default |
+|----------|-------------|----------|
+| `FLASK_RUN_PORT` | Port for Flask service | 5001 |
+| `MAX_FILE_SIZE_MB` | Maximum file upload size in MB | 10 |
+| `OTP_EXPIRY_MINUTES` | OTP expiration time in minutes | 15 |
+| `RATE_LIMIT_BYPASS` | Bypass rate limiting (development only) | false |
+
+> **Security Warning**: Never commit `.env.local` or `.env` files to version control. Use different secrets for development and production.
 
 ## 📄 License
 

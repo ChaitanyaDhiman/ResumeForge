@@ -39,14 +39,14 @@ export default function SignIn() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-6 py-12 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 py-8 sm:py-12 relative overflow-hidden">
             {/* Background Blobs */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none z-0">
-                <div className="absolute top-[10%] left-[10%] w-[500px] h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />
-                <div className="absolute bottom-[10%] right-[10%] w-[500px] h-[500px] bg-violet-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
+                <div className="absolute top-[10%] left-[10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-indigo-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob" />
+                <div className="absolute bottom-[10%] right-[10%] w-[300px] sm:w-[500px] h-[300px] sm:h-[500px] bg-violet-200/30 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
             </div>
 
-            <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-500/10 border border-white/50 p-8 md:p-12 w-full max-w-md relative z-10">
+            <div className="bg-white/70 backdrop-blur-xl rounded-3xl shadow-2xl shadow-indigo-500/10 border border-white/50 p-6 sm:p-8 md:p-12 w-full max-w-md relative z-10">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white mb-4 shadow-lg shadow-indigo-500/30">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,8 +55,8 @@ export default function SignIn() {
                             <line x1="15" y1="12" x2="3" y2="12" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-bold text-slate-900">Welcome Back</h1>
-                    <p className="text-slate-600 mt-2">Sign in to continue optimizing your resume</p>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">Welcome Back</h1>
+                    <p className="text-sm sm:text-base text-slate-600 mt-2">Sign in to continue optimizing your resume</p>
                 </div>
 
                 {error && (

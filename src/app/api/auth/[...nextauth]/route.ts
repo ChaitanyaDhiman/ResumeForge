@@ -51,6 +51,22 @@ export const authOptions: NextAuthOptions = {
     ],
     session: {
         strategy: "jwt",
+        // Session expires after 30 days of inactivity
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        // Update session age on every request (sliding sessions)
+        updateAge: 24 * 60 * 60, // 24 hours
+    },
+    // Secure cookie configuration
+    cookies: {
+        sessionToken: {
+            name: `${process.env.NODE_ENV === 'production' ? '__Secure-' : ''}next-auth.session-token`,
+            options: {
+                httpOnly: true,
+                sameSite: 'lax',
+                path: '/',
+                secure: process.env.NODE_ENV === 'production',
+            },
+        },
     },
     pages: {
         signIn: '/signin',
@@ -84,7 +100,7 @@ export const authOptions: NextAuthOptions = {
             }
             return session;
         },
-        async jwt({ token, user, account }) {
+        async jwt({ token, user, account, trigger }) {
             if (user) {
                 token.id = user.id;
                 token.isEmailVerified = (user as any).isEmailVerified ?? false;
@@ -98,9 +114,26 @@ export const authOptions: NextAuthOptions = {
                 // Clear the flag after first session
                 token.isNewUser = false;
             }
+
+            // Handle session updates (e.g., after email verification)
+            if (trigger === 'update' && token.email) {
+                const updatedUser = await prisma.user.findUnique({
+                    where: { email: token.email as string }
+                });
+                if (updatedUser) {
+                    token.isEmailVerified = updatedUser.isEmailVerified;
+                }
+            }
+
             return token;
         }
-    }
+    },
+    // Enhanced JWT configuration
+    jwt: {
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+    },
+    // Enable debug in development
+    debug: process.env.NODE_ENV === 'development',
 };
 
 const handler = NextAuth(authOptions);
