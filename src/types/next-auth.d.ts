@@ -8,6 +8,8 @@ declare module "next-auth" {
         user: {
             /** The user's id. */
             id: string
+            /** The user's role. */
+            role: "ADMIN" | "PREMIUM" | "FREE"
             /** Whether the user's email is verified. */
             isEmailVerified: boolean
             /** Whether the user is new. */
@@ -17,6 +19,7 @@ declare module "next-auth" {
 
     interface User {
         id: string
+        role?: "ADMIN" | "PREMIUM" | "FREE"
         isEmailVerified?: boolean
         isNewUser?: boolean
     }
@@ -25,6 +28,7 @@ declare module "next-auth" {
 declare module "next-auth/jwt" {
     interface JWT {
         id: string
+        role: "ADMIN" | "PREMIUM" | "FREE"
         isEmailVerified: boolean
         isNewUser?: boolean
     }

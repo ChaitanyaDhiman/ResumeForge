@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  PREMIUM
+  FREE
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -15,6 +21,8 @@ model User {
   isEmailVerified Boolean @default(false)
   image         String?
   password      String?
+  role          UserRole  @default(FREE)
+  optimizationLimit Int?  // null = unlimited, number = specific limit
   accounts      Account[]
   sessions      Session[]
   optimizationLogs OptimizationLog[]

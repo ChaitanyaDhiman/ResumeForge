@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import SuggestionDisplay from './SuggestionDisplay';
@@ -28,6 +28,28 @@ export default function UploadForm() {
   const [suggestions, setSuggestions] = useState<LLMSuggestions | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showSignInModal, setShowSignInModal] = useState(false);
+  const [remainingOptimizations, setRemainingOptimizations] = useState<number | null>(null);
+  const [isUnlimited, setIsUnlimited] = useState(false);
+
+  // Fetch usage on mount and when session changes
+  useEffect(() => {
+    if (session?.user) {
+      fetchUsage();
+    }
+  }, [session]);
+
+  const fetchUsage = async () => {
+    try {
+      const response = await fetch('/api/usage');
+      if (response.ok) {
+        const data = await response.json();
+        setRemainingOptimizations(data.remaining);
+        setIsUnlimited(data.unlimited);
+      }
+    } catch (error) {
+      console.error('Failed to fetch usage:', error);
+    }
+  };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -99,6 +121,8 @@ export default function UploadForm() {
         const data = await response.json();
         setSuggestions(data.llmSuggestions);
         setCurrentStep(3);
+        // Refresh usage count after successful optimization
+        fetchUsage();
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       } finally {
@@ -115,6 +139,34 @@ export default function UploadForm() {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
+      {/* Usage Indicator */}
+      {session?.user && (
+        <div className="mb-6 flex justify-end">
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${isUnlimited
+              ? 'bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-lg shadow-purple-500/30'
+              : remainingOptimizations !== null && remainingOptimizations > 0
+                ? 'bg-white/70 backdrop-blur-sm text-slate-700 border border-slate-200'
+                : 'bg-red-50 text-red-600 border border-red-200'
+            }`}>
+            {isUnlimited ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2v20M2 12h20" />
+                </svg>
+                <span>Unlimited Optimizations</span>
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                <span>{remainingOptimizations} {remainingOptimizations === 1 ? 'optimization' : 'optimizations'} remaining this month</span>
+              </>
+            )}
+          </div>
+        </div>
+      )}
       {/* Sign-In Modal */}
       {showSignInModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

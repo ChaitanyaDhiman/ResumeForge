@@ -45,6 +45,7 @@ export const authOptions: NextAuthOptions = {
                     name: user.name,
                     email: user.email,
                     image: user.image,
+                    role: user.role,
                 };
             }
         })
@@ -90,11 +91,13 @@ export const authOptions: NextAuthOptions = {
         },
         async session({ session, token }) {
             if (token && session.user) {
+                session.user.id = token.id as string;
                 session.user.name = token.name;
                 session.user.email = token.email;
                 session.user.image = token.picture;
-                (session.user as any).isNewUser = token.isNewUser || false;
-                (session.user as any).isEmailVerified = token.isEmailVerified || false;
+                session.user.role = token.role;
+                session.user.isNewUser = token.isNewUser || false;
+                session.user.isEmailVerified = token.isEmailVerified || false;
             }
             return session;
         },
@@ -102,6 +105,7 @@ export const authOptions: NextAuthOptions = {
             if (user) {
                 token.id = user.id;
                 token.isEmailVerified = (user as any).isEmailVerified ?? false;
+                token.role = user.role || "FREE";
 
                 // For OAuth users, auto-verify email and mark as new user on first sign-in
                 if (account?.provider === "google") {
@@ -122,6 +126,8 @@ export const authOptions: NextAuthOptions = {
                         } else {
                             token.isNewUser = false;
                         }
+                        // Always sync role from database
+                        token.role = dbUser.role;
                     }
                 } else {
                     token.isNewUser = false;

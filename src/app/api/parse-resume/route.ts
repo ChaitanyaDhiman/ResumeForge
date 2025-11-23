@@ -106,17 +106,25 @@ export async function POST(request: Request) {
       });
     }
 
-    // 3. Monthly usage limit (3 per month)
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    const usageCount = await prisma.optimizationLog.count({
-      where: {
-        userId: userId,
-        createdAt: { gte: oneMonthAgo },
-      },
-    });
-    if (usageCount >= 3) {
-      return NextResponse.json({ error: 'Monthly resume optimization limit reached (3 per month). Please try again next month.' }, { status: 429 });
+    // 3. Check optimization limits based on user role
+    // Admin and users with null optimizationLimit have unlimited access
+    if (userRecord.role !== 'ADMIN' && userRecord.optimizationLimit !== null) {
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      const usageCount = await prisma.optimizationLog.count({
+        where: {
+          userId: userId,
+          createdAt: { gte: startOfMonth },
+        },
+      });
+
+      if (usageCount >= userRecord.optimizationLimit) {
+        return NextResponse.json({
+          error: `Monthly resume optimization limit reached (${userRecord.optimizationLimit} per month). Please upgrade your plan or try again next month.`
+        }, { status: 429 });
+      }
     }
 
     // 4. Parse and validate input

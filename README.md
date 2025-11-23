@@ -32,8 +32,19 @@ ResumeForge is an AI-powered resume optimization tool that helps job seekers tai
   - Secure, HTTP-only cookies with SameSite protection
   - CSRF protection enabled
   - Session sliding (auto-renewal on activity)
+- **Role-Based Access Control (RBAC)**:
+  - **Free Tier**:
+    - 3 resume optimizations per month
+    - Standard support
+  - **Premium Tier**:
+    - Unlimited resume optimizations
+    - Priority support
+  - **Admin**:
+    - Full system access
+    - User management capabilities
+    - Unlimited optimizations
 - **Usage Limits**:
-  - **Monthly Quota**: 3 resume optimizations per user per month
+  - **Monthly Quota**: Enforced based on user role
   - **Usage Tracking**: Real-time tracking of optimization requests
 - **Rate Limiting**: Protection against API abuse and DoS attacks
   - Registration: 5 requests/minute per IP
