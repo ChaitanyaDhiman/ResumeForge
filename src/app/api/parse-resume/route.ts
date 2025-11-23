@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import { OpenAI } from 'openai';
 
 interface Suggestion {
-  type: 'ADD' | 'REVISE' | 'REMOVE'; 
-  section: string;         
-  targetText?: string;     
-  suggestedText: string;   
+  type: 'ADD' | 'REVISE' | 'REMOVE';
+  section: string;
+  targetText?: string;
+  suggestedText: string;
   reason: string;
 }
 
@@ -63,7 +63,7 @@ function generateAnalysisPrompt(resumeText: string, jobDescription: string): str
 
 const openai = new OpenAI();
 
-const FLASK_PARSER_URL = 'http://localhost:5001';
+const FLASK_PARSER_URL = process.env.FLASK_PARSER_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}/api/python` : 'http://localhost:5001');
 
 export async function POST(request: Request) {
   try {
@@ -72,23 +72,23 @@ export async function POST(request: Request) {
     const jobDescription = formData.get('jobDescription') as string;
 
     if (!resumeFile || typeof resumeFile === 'string') {
-        return NextResponse.json({ error: 'Resume file is missing or invalid' }, { status: 400 });
+      return NextResponse.json({ error: 'Resume file is missing or invalid' }, { status: 400 });
     }
-    
+
     const flaskFormData = new FormData();
-    flaskFormData.append('file', resumeFile); 
+    flaskFormData.append('file', resumeFile);
 
     console.log(`Sending file to Flask at: ${FLASK_PARSER_URL}/extract-text`);
-    
+
     const parserResponse = await fetch(`${FLASK_PARSER_URL}/extract-text`, {
       method: 'POST',
-      body: flaskFormData, 
+      body: flaskFormData,
     });
 
     if (!parserResponse.ok) {
       const errorData = await parserResponse.json();
-      return NextResponse.json({ 
-        error: `File parsing failed in Python service: ${errorData.error}` 
+      return NextResponse.json({
+        error: `File parsing failed in Python service: ${errorData.error}`
       }, { status: parserResponse.status });
     }
 
@@ -107,28 +107,28 @@ export async function POST(request: Request) {
           content: analysisPrompt,
         },
       ],
-      response_format: { type: "json_object" }, 
+      response_format: { type: "json_object" },
       temperature: 0.1,
     });
 
     let llmRawResponse = completion.choices[0].message.content;
-    
+
     llmRawResponse = llmRawResponse || '{}';
     let llmSuggestions: LLMSuggestions;
 
     try {
-        const parsed = JSON.parse(llmRawResponse) as Partial<LLMSuggestions>;
-        
-        llmSuggestions = {
-            summary: parsed.summary || "LLM did not provide a detailed summary. Try running again.",
-            changes: Array.isArray(parsed.changes) ? parsed.changes : [],
-        };
-        
+      const parsed = JSON.parse(llmRawResponse) as Partial<LLMSuggestions>;
+
+      llmSuggestions = {
+        summary: parsed.summary || "LLM did not provide a detailed summary. Try running again.",
+        changes: Array.isArray(parsed.changes) ? parsed.changes : [],
+      };
+
     } catch (e) {
-        console.error("Failed to parse LLM JSON response:", llmRawResponse);
-        return NextResponse.json({ 
-            error: "LLM returned unparsable JSON. Try again." 
-        }, { status: 500 });
+      console.error("Failed to parse LLM JSON response:", llmRawResponse);
+      return NextResponse.json({
+        error: "LLM returned unparsable JSON. Try again."
+      }, { status: 500 });
     }
 
     return NextResponse.json({

@@ -1,0 +1,22 @@
+{
+    "builds": [
+        {
+            "src": "resumeforge-parser/app.py",
+            "use": "@vercel/python"
+        },
+        {
+            "src": "package.json",
+            "use": "@vercel/next"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/python/(.*)",
+            "dest": "/resumeforge-parser/app.py"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/$1"
+        }
+    ]
+}
