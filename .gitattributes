@@ -1,0 +1,19 @@
+# Ignore package manager lock files (often causes 20%+ "Other" or "JSON")
+package-lock.json linguist-vendored
+yarn.lock linguist-vendored
+pnpm-lock.yaml linguist-vendored
+
+# Ignore the public directory (assets, images, fonts)
+public/* linguist-vendored
+
+# Ignore database migrations/schema if you don't want them counted
+prisma/* linguist-vendored
+
+# Ignore the Python virtual environment if it was accidentally committed
+resumeforge-parser/venv/* linguist-vendored
+resumeforge-parser/__pycache__/* linguist-vendored
+
+# Force explicit language detection (optional, but good for accuracy)
+*.ts linguist-language=TypeScript
+*.tsx linguist-language=TypeScript
+*.py linguist-language=Python
