@@ -9,6 +9,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+/resumeforge-parser/venv
 
 # testing
 /coverage
